@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import './App.css';
 
@@ -14,7 +14,8 @@ class App extends React.Component {
     super();
 
     this.state = {
-      currentUser: null
+      currentUser: null,
+      isLogedIn: false
     }
   }
 
@@ -30,12 +31,13 @@ class App extends React.Component {
             currentUser: {
               id: snapShot.id,
               ...snapShot.data()
-            }
+            },
+            isLogedIn: true
           })
         });
       }
       else {
-        this.setState({currentUser: userAuth});
+        this.setState({currentUser: userAuth, isLogedIn: false});
       }
     });
   }
@@ -51,7 +53,9 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route path='/shop' component={ShopPage} />
-          <Route path='/signin' component={SignInAndSignUpPage} />
+          <Route path='/signin' component={SignInAndSignUpPage} > 
+            {this.state.isLogedIn ? <Redirect to='/' /> : <SignInAndSignUpPage />}
+          </Route>
         </Switch>
       </div>
     );

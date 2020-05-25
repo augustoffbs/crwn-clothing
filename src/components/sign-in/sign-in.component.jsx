@@ -1,9 +1,10 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 
 import FormInput from '../form-input/form-input.component.jsx';
 import CustomButton from '../custom-button/custom-button.component.jsx';
 
-import { signInWithGoogle } from '../../firebase/firebase.utils';
+import { auth, signInWithGoogle } from '../../firebase/firebase.utils';
 
 import './sign-in.styles.scss';
 
@@ -17,9 +18,16 @@ class SignIn extends React.Component {
         }
     }
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         event.preventDefault();
-        this.setState({email:'', password:''});
+        const { email, password } = this.state;
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            this.setState({email:'', password:''});
+            return <Redirect to='/'/>;
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     handleChange = event => {
@@ -49,8 +57,8 @@ class SignIn extends React.Component {
                         handleChange={this.handleChange}
                         required />
                     <div className='buttons'>
-                        <CustomButton type="submit" value="Submit Form"> Sign in </CustomButton>
-                        <CustomButton type="submit" formNoValidate onClick={ signInWithGoogle } isGoogleSignIn>
+                        <CustomButton type="submit" value="Submit Form" onClick={ this.handleSubmit }> Sign in </CustomButton>
+                        <CustomButton type="button" formNoValidate onClick={ signInWithGoogle } isGoogleSignIn>
                         {' '} 
                         Sign in with Google {' '}
                         </CustomButton>
